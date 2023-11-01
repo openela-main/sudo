@@ -1,0 +1,19 @@
+diff -up ./plugins/sudoers/audit.c.undefined ./plugins/sudoers/audit.c
+--- ./plugins/sudoers/audit.c.undefined	2021-07-12 14:59:53.472306208 +0200
++++ ./plugins/sudoers/audit.c	2021-07-12 15:00:45.620620369 +0200
+@@ -197,7 +197,6 @@ sudoers_audit_open(unsigned int version,
+     debug_return_int(ret);
+ }
+ 
+-#ifdef SUDOERS_LOG_CLIENT
+ static void
+ audit_to_eventlog(struct eventlog *evlog, char * const command_info[],
+     char * const run_argv[], char * const run_envp[])
+@@ -244,6 +243,7 @@ audit_to_eventlog(struct eventlog *evlog
+     debug_return;
+ }
+ 
++#ifdef SUDOERS_LOG_CLIENT
+ static bool
+ log_server_accept(char * const command_info[], char * const run_argv[],
+     char * const run_envp[])
