@@ -1,0 +1,51 @@
+From 613a8053dbc3ab43cf0cdaf09f207ffdb0b40e08 Mon Sep 17 00:00:00 2001
+From: Radovan Sroka <rsroka@redhat.com>
+Date: Wed, 7 Apr 2021 14:43:40 +0200
+Subject: [PATCH] Fixed bad condition for sesh args
+
+In selinux_edit_copy_tfiles() when there is only one file and the open()
+fails then number of arguments is lower than expected.
+Sudo should return error with or without "Defaults !sudoedit_checkdir" set.
+
+This was found with regression testing of CVE-2021-23240.
+
+Signed-off-by: Radovan Sroka <rsroka@redhat.com>
+---
+ src/sudo_edit.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/src/sudo_edit.c b/src/sudo_edit.c
+index 41fc61c3a..15c75d8c4 100644
+--- a/src/sudo_edit.c
++++ b/src/sudo_edit.c
+@@ -529,6 +529,8 @@ selinux_edit_copy_tfiles(struct command_details *command_details,
+     if (nfiles < 1)
+ 	debug_return_int(0);
+ 
++    const int check_dir = ISSET(command_details->flags, CD_SUDOEDIT_CHECKDIR);
++
+     /* Construct common args for sesh */
+     sesh_nargs = 5 + (nfiles * 2) + 1;
+     sesh_args = sesh_ap = reallocarray(NULL, sesh_nargs, sizeof(char *));
+@@ -538,7 +540,7 @@ selinux_edit_copy_tfiles(struct command_details *command_details,
+     }
+     *sesh_ap++ = "sesh";
+     *sesh_ap++ = "-e";
+-    if (ISSET(command_details->flags, CD_SUDOEDIT_CHECKDIR)) {
++    if (check_dir) {
+ 	if ((user_str = selinux_fmt_sudo_user()) == NULL) {
+ 	    sudo_warnx(U_("%s: %s"), __func__, U_("unable to allocate memory"));
+ 	    goto done;
+@@ -581,7 +583,11 @@ selinux_edit_copy_tfiles(struct command_details *command_details,
+     if (tfd != -1)
+ 	close(tfd);
+ 
+-    if (sesh_ap - sesh_args > 3) {
++    /*
++     * check dir adds two more args to the array
++     */
++    if ((!check_dir && sesh_ap - sesh_args > 3)
++        || (check_dir && sesh_ap - sesh_args > 5)) {
+ 	/* Run sesh -e 1 <t1> <o1> ... <tn> <on> */
+ 	error = selinux_run_helper(command_details->cred.uid, command_details->cred.gid,
+ 	    command_details->cred.ngroups, command_details->cred.groups, sesh_args,
