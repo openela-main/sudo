@@ -1,0 +1,26 @@
+From e4f08157b6693b956fe9c7c987bc3eeac1abb2cc Mon Sep 17 00:00:00 2001
+From: Tim Shearer <timtimminz@gmail.com>
+Date: Tue, 2 Aug 2022 08:48:32 -0400
+Subject: [PATCH] Fix incorrect SHA384/512 digest calculation.
+
+Resolves an issue where certain message sizes result in an incorrect
+checksum. Specifically, when:
+(n*8) mod 1024 == 896
+where n is the file size in bytes.
+---
+ lib/util/sha2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/util/sha2.c b/lib/util/sha2.c
+index b7a28cca8..f769f77f2 100644
+--- a/lib/util/sha2.c
++++ b/lib/util/sha2.c
+@@ -490,7 +490,7 @@ SHA512Pad(SHA2_CTX *ctx)
+ 	SHA512Update(ctx, (uint8_t *)"\200", 1);
+ 
+ 	/* Pad message such that the resulting length modulo 1024 is 896. */
+-	while ((ctx->count[0] & 1008) != 896)
++	while ((ctx->count[0] & 1016) != 896)
+ 		SHA512Update(ctx, (uint8_t *)"\0", 1);
+ 
+ 	/* Append length of message in bits and do final SHA512Transform(). */
