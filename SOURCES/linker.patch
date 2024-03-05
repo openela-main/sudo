@@ -1,0 +1,79 @@
+From ecaa9cd08d25870ec89fec82cf17c6cdaa4c7912 Mon Sep 17 00:00:00 2001
+From: "Todd C. Miller" <Todd.Miller@sudo.ws>
+Date: Sat, 6 Feb 2021 08:36:01 -0700
+Subject: [PATCH] Add libsudo_eventlog.la as a dependency of libsudo_iolog.la
+ No longer need to link against libsudo_eventlog.la in sudoers.
+
+---
+ lib/iolog/Makefile.in       | 7 ++++---
+ plugins/sudoers/Makefile.in | 8 ++++----
+ 2 files changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/lib/iolog/Makefile.in b/lib/iolog/Makefile.in
+index 2ae9c1b42..8fbc76c98 100644
+--- a/lib/iolog/Makefile.in
++++ b/lib/iolog/Makefile.in
+@@ -1,7 +1,7 @@
+ #
+ # SPDX-License-Identifier: ISC
+ #
+-# Copyright (c) 2011-2020 Todd C. Miller <Todd.Miller@sudo.ws>
++# Copyright (c) 2011-2021 Todd C. Miller <Todd.Miller@sudo.ws>
+ #
+ # Permission to use, copy, modify, and distribute this software for any
+ # purpose with or without fee is hereby granted, provided that the above
+@@ -36,7 +36,8 @@ CC = @CC@
+ LIBTOOL = @LIBTOOL@
+ 
+ # Libraries
+-LT_LIBS = $(top_builddir)/lib/util/libsudo_util.la
++LT_LIBS = $(top_builddir)/lib/eventlog/libsudo_eventlog.la \
++	  $(top_builddir)/lib/util/libsudo_util.la
+ LIBS = @LIBS@ @ZLIB@ $(LT_LIBS)
+ 
+ # C preprocessor flags
+@@ -76,7 +77,7 @@ PVS_LOG_OPTS = -a 'GA:1,2' -e -t errorfile -d $(PVS_IGNORE)
+ 
+ # Regression tests
+ TEST_PROGS = check_iolog_json check_iolog_mkpath check_iolog_path check_iolog_util host_port_test
+-TEST_LIBS = @LIBS@ $(top_builddir)/lib/eventlog/libsudo_eventlog.la
++TEST_LIBS = @LIBS@
+ TEST_LDFLAGS = @LDFLAGS@
+ 
+ # Set to non-empty for development mode
+diff --git a/plugins/sudoers/Makefile.in b/plugins/sudoers/Makefile.in
+index 77d54553b..8eadf479d 100644
+--- a/plugins/sudoers/Makefile.in
++++ b/plugins/sudoers/Makefile.in
+@@ -1,7 +1,7 @@
+ #
+ # SPDX-License-Identifier: ISC
+ #
+-# Copyright (c) 1996, 1998-2005, 2007-2020
++# Copyright (c) 1996, 1998-2005, 2007-2021
+ #       Todd C. Miller <Todd.Miller@sudo.ws>
+ #
+ # Permission to use, copy, modify, and distribute this software for any
+@@ -61,8 +61,8 @@ LIBLOGSRV = @LIBLOGSRV@
+ LIBUTIL = $(top_builddir)/lib/util/libsudo_util.la
+ LIBS = $(LIBUTIL)
+ NET_LIBS = @NET_LIBS@
+-SUDOERS_LIBS = @SUDOERS_LIBS@ @AFS_LIBS@ @GETGROUPS_LIB@ @LIBTLS@ $(NET_LIBS) $(LIBIOLOG) $(LIBEVENTLOG) $(LIBLOGSRV)
+-REPLAY_LIBS = @REPLAY_LIBS@ $(LIBEVENTLOG) $(LIBIOLOG)
++SUDOERS_LIBS = @SUDOERS_LIBS@ @AFS_LIBS@ @GETGROUPS_LIB@ @LIBTLS@ $(NET_LIBS) $(LIBIOLOG) $(LIBLOGSRV)
++REPLAY_LIBS = @REPLAY_LIBS@ $(LIBIOLOG)
+ VISUDO_LIBS = $(NET_LIBS)
+ CVTSUDOERS_LIBS = $(NET_LIBS)
+ TESTSUDOERS_LIBS = $(NET_LIBS)
+@@ -323,7 +323,7 @@ check_hexchar: $(CHECK_HEXCHAR_OBJS) $(LIBUTIL)
+ 	$(LIBTOOL) $(LTFLAGS) --mode=link $(CC) -o $@ $(CHECK_HEXCHAR_OBJS) $(LDFLAGS) $(ASAN_LDFLAGS) $(PIE_LDFLAGS) $(SSP_LDFLAGS) $(LIBS)
+ 
+ check_iolog_plugin: $(CHECK_IOLOG_PLUGIN_OBJS) $(LIBUTIL) $(LIBIOLOG) $(LIBLOGSRV)
+-	$(LIBTOOL) $(LTFLAGS) --mode=link $(CC) -o $@ $(CHECK_IOLOG_PLUGIN_OBJS) $(LDFLAGS) $(ASAN_LDFLAGS) $(PIE_LDFLAGS) $(SSP_LDFLAGS) $(LIBIOLOG) $(LIBEVENTLOG) $(LIBLOGSRV) @LIBTLS@
++	$(LIBTOOL) $(LTFLAGS) --mode=link $(CC) -o $@ $(CHECK_IOLOG_PLUGIN_OBJS) $(LDFLAGS) $(ASAN_LDFLAGS) $(PIE_LDFLAGS) $(SSP_LDFLAGS) $(LIBIOLOG) $(LIBLOGSRV) @LIBTLS@
+ 
+ check_starttime: $(CHECK_STARTTIME_OBJS) $(LIBUTIL)
+ 	$(LIBTOOL) $(LTFLAGS) --mode=link $(CC) -o $@ $(CHECK_STARTTIME_OBJS) $(LDFLAGS) $(ASAN_LDFLAGS) $(PIE_LDFLAGS) $(SSP_LDFLAGS) $(LIBS)
+-- 
+2.43.0
+

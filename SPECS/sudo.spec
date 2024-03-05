@@ -1,7 +1,7 @@
 Summary: Allows restricted root access for specified users
 Name: sudo
 Version: 1.9.5p2
-Release: 9%{?dist}
+Release: 10%{?dist}
 License: ISC
 URL: https://www.sudo.ws
 
@@ -34,6 +34,20 @@ Patch6: covscan.patch
 Patch7: sha-digest-calc.patch
 Patch8: sudo-1.9.12-CVE-2023-22809.patch
 
+Patch9: sudo-1.9.13-CVE-2023-28486-7-1.patch
+Patch10: sudo-1.9.13-CVE-2023-28486-7-2.patch
+Patch11: sudo-1.9.13-CVE-2023-28486-7-3.patch
+Patch12: sudo-1.9.13-CVE-2023-28486-7-4.patch
+Patch13: sudo-1.9.13-CVE-2023-28486-7-5.patch
+Patch14: sudo-1.9.13-CVE-2023-28486-7-6.patch
+Patch15: sudo-1.9.13-CVE-2023-28486-7-7.patch
+Patch16: sudo-1.9.13-CVE-2023-28486-7-8.patch
+Patch17: sudo-1.9.13-CVE-2023-28486-7-9.patch
+
+Patch18: linker.patch
+
+Patch19: sudo-1.9.15-CVE-2023-42465.patch
+
 %description
 Sudo (superuser do) allows a system administrator to give certain
 users (or groups of users) the ability to run some (or all) commands
@@ -65,14 +79,28 @@ BuildRequires:  python3-devel
 %prep
 %setup -q
 
-%patch1 -p1 -b .sudo-conf
-%patch2 -p1 -b .undefined
-%patch3 -p1 -b .selinux-t
-%patch4 -p1 -b .bad-cond
-%patch5 -p1 -b .utmp-leak
-%patch6 -p1 -b .covscan
-%patch7 -p1 -b .sha-digest
-%patch8 -p1 -b .cve-fix
+%patch -P 1 -p1 -b .sudo-conf
+%patch -P 2 -p1 -b .undefined
+%patch -P 3 -p1 -b .selinux-t
+%patch -P 4 -p1 -b .bad-cond
+%patch -P 5 -p1 -b .utmp-leak
+%patch -P 6 -p1 -b .covscan
+%patch -P 7 -p1 -b .sha-digest
+%patch -P 8 -p1 -b .cve-fix
+
+%patch -P 9 -p1 -b .cve-escape-1
+%patch -P 10 -p1 -b .cve-escape-2
+%patch -P 11 -p1 -b .cve-escape-3
+%patch -P 12 -p1 -b .cve-escape-4
+%patch -P 13 -p1 -b .cve-escape-5
+%patch -P 14 -p1 -b .cve-escape-6
+%patch -P 15 -p1 -b .cve-escape-7
+%patch -P 16 -p1 -b .cve-escape-8
+%patch -P 17 -p1 -b .cve-escape-9
+
+%patch -P 18 -p1 -b .linker
+%patch -P 19 -p1 -b .rowhammer
+
 
 %build
 # Remove bundled copy of zlib
@@ -247,6 +275,16 @@ EOF
 %attr(0644,root,root) %{_libexecdir}/sudo/python_plugin.so
 
 %changelog
+* Mon Jan 22 2024 Radovan Sroka <rsroka@redhat.com> - 1.9.5p2-10
+RHEL 9.3.0.Z ERRATUM
+- CVE-2023-28487 sudo: Sudo does not escape control characters in sudoreplay output
+Resolves: RHEL-21834
+- CVE-2023-28486 sudo: Sudo does not escape control characters in log messages
+Resolves: RHEL-21828
+- CVE-2023-42465 sudo: Targeted Corruption of Register and Stack Variables
+Resolves: RHEL-21821
+
+
 * Thu Jan 19 2023 Radovan Sroka <rsroka@redhat.com> - 1.9.5p2-9
 RHEL 9.2.0 ERRATUM
 - CVE-2023-22809 sudo: arbitrary file write with privileges of the RunAs user
