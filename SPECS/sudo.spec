@@ -1,7 +1,7 @@
 Summary: Allows restricted root access for specified users
 Name: sudo
-Version: 1.8.29
-Release: 10%{?dist}
+Version: 1.9.5p2
+Release: 1%{?dist}
 License: ISC
 Group: Applications/System
 URL: https://www.sudo.ws/
@@ -31,57 +31,27 @@ BuildRequires: openldap-devel
 BuildRequires: pam-devel
 BuildRequires: zlib-devel
 
-# don't strip
-Patch1: sudo-1.6.7p5-strip.patch
-# 881258 - rpmdiff: added missing sudo-ldap.conf manpage
-Patch2: sudo-1.8.23-sudoldapconfman.patch
-# env debug patch
-Patch3: sudo-1.7.2p1-envdebug.patch
-# 1247591 - Sudo taking a long time when user information is stored externally.
-Patch4: sudo-1.8.23-legacy-group-processing.patch
-# 840980 - sudo creates a new parent process
-# Adds cmnd_no_wait Defaults option
-Patch5: sudo-1.8.23-nowaitopt.patch
-# 1312486 - RHEL7 sudo logs username "root" instead of realuser in /var/log/secure
-Patch6: sudo-1.8.6p7-logsudouser.patch
-# 1786987 - CVE-2019-19232 sudo: attacker with access to a Runas ALL sudoer account
-# can impersonate a nonexistent user [rhel-8]
-Patch7: sudo-1.8.29-CVE-2019-19232.patch
-# 1796518 - [RFE] add optional check for the target user shell
-Patch8: sudo-1.8.29-CVE-2019-19234.patch
-# 1798093 - CVE-2019-18634 sudo: Stack based buffer overflow in when pwfeedback is enabled [rhel-8.2.0]
-Patch9: sudo-1.8.29-CVE-2019-18634.patch
+Patch2: sudo-1.9.5-undefined-symbol.patch
+Patch3: sudo-1.9.5-selinux-t.patch
+Patch4: sudo-1.9.5-sesh-bad-condition.patch
+Patch5: sudo-1.9.5-utmp-leak.patch
+Patch6: covscan.patch
+Patch7: sha-digest-calc.patch
+Patch8: sudo-1.9.12-CVE-2023-22809.patch
 
-# 1815164 - sudo allows privilege escalation with expire password
-Patch10: sudo-1.8.29-expired-password-part1.patch
-Patch11: sudo-1.8.29-expired-password-part2.patch
+Patch9: sudo-1.9.13-CVE-2023-28486-7-1.patch
+Patch10: sudo-1.9.13-CVE-2023-28486-7-2.patch
+Patch11: sudo-1.9.13-CVE-2023-28486-7-3.patch
+Patch12: sudo-1.9.13-CVE-2023-28486-7-4.patch
+Patch13: sudo-1.9.13-CVE-2023-28486-7-5.patch
+Patch14: sudo-1.9.13-CVE-2023-28486-7-6.patch
+Patch15: sudo-1.9.13-CVE-2023-28486-7-7.patch
+Patch16: sudo-1.9.13-CVE-2023-28486-7-8.patch
+Patch17: sudo-1.9.13-CVE-2023-28486-7-9.patch
 
-# 1917734 - EMBARGOED CVE-2021-3156 sudo: Heap-buffer overflow in argument parsing [rhel-8.4.0]
-Patch12: sudo-1.8.31-CVE-2021-3156.patch
-# 1916434 - CVE-2021-23239 sudo: possible directory existence test due to race condition in sudoedit [rhel-8]
-Patch13: sudo-1.9.5-CVE-2021-23239.patch
-# 1917038 - CVE-2021-23240 sudo: symbolic link attack in SELinux-enabled sudoedit [rhel-8]
-Patch14: sudo-1.9.5-CVE-2021-23240-1.patch
-Patch15: sudo-1.9.5-CVE-2021-23240-2.patch
-Patch16: sudo-1.9.5-CVE-2021-23240-3.patch
-Patch17: sudo-1.9.5-CVE-2021-23240-4.patch
-Patch18: sudo-1.9.5-CVE-2021-23240-5.patch
+Patch18: linker.patch
 
-# 2029551 - sudoedit does not work with selinux args
-Patch19: sudo-1.9.5-sudoedit-selinux.patch
-# 1999751 - Request to backport https://www.sudo.ws/repos/sudo/rev/b4c91a0f72e7 to RHEL 8
-Patch20: sudo-1.9.7-sigchild.patch
-# 1917379 - [RFE] pass KRB5CCNAME to pam_authenticate environment if available
-Patch21: sudo-1.9.7-krb5ccname.patch
-# 1986572 - utmp resource leak in sudo
-Patch22: sudo-1.9.7-utmp-leak.patch
-
-# 2114576 - sudo digest check fails incorrectly for certain file sizes (SHA512/SHA384)
-Patch23: sha-digest-calc.patch
-# 2161221 - EMBARGOED CVE-2023-22809 sudo: arbitrary file write with privileges of the RunAs user [rhel-8.8.0]
-Patch24: sudo-1.9.12-CVE-2023-22809-whitelist.patch
-Patch25: sudo-1.9.12-CVE-2023-22809-backports.patch
-Patch26: sudo-1.9.12-CVE-2023-22809.patch
+Patch19: sudo-1.9.15-CVE-2023-42465.patch
 
 %description
 Sudo (superuser do) allows a system administrator to give certain
@@ -106,39 +76,27 @@ plugins that use %{name}.
 %prep
 %setup -q
 
-%patch1 -p1 -b .strip
-%patch2 -p1 -b .sudoldapconfman
-%patch3 -p1 -b .env-debug
-%patch4 -p1 -b .legacy-processing
-%patch5 -p1 -b .nowait
-%patch6 -p1 -b .logsudouser
-%patch7 -p1 -b .CVE-2019-19232
-%patch8 -p1 -b .target-shell
-%patch9 -p1 -b .CVE-2019-18634
+%patch -P 2 -p1 -b .undefined
+%patch -P 3 -p1 -b .selinux-t
+%patch -P 4 -p1 -b .bad-cond
+%patch -P 5 -p1 -b .utmp-leak
+%patch -P 6 -p1 -b .covscan
+%patch -P 7 -p1 -b .sha-digest
+%patch -P 8 -p1 -b .cve-fix
 
-%patch10 -p1 -b .expired1
-%patch11 -p1 -b .expired2
+%patch -P 9 -p1 -b .cve-escape-1
+%patch -P 10 -p1 -b .cve-escape-2
+%patch -P 11 -p1 -b .cve-escape-3
+%patch -P 12 -p1 -b .cve-escape-4
+%patch -P 13 -p1 -b .cve-escape-5
+%patch -P 14 -p1 -b .cve-escape-6
+%patch -P 15 -p1 -b .cve-escape-7
+%patch -P 16 -p1 -b .cve-escape-8
+%patch -P 17 -p1 -b .cve-escape-9
 
-%patch12 -p1 -b .heap-buffer
+%patch -P 18 -p1 -b .linker
 
-%patch13 -p1 -b .sudoedit-race
-
-%patch14 -p1 -b .symbolic-link-attack-1
-%patch15 -p1 -b .symbolic-link-attack-2
-%patch16 -p1 -b .symbolic-link-attack-3
-%patch17 -p1 -b .symbolic-link-attack-4
-%patch18 -p1 -b .symbolic-link-attack-5
-
-%patch19 -p1 -b .sudoedit-selinux
-
-%patch20 -p1 -b .sigchild
-%patch21 -p1 -b .krb5ccname
-%patch22 -p1 -b .utmp-leak
-
-%patch23 -p1 -b .sha-digest
-%patch24 -p1 -b .whitelist
-%patch25 -p1 -b .backports
-%patch26 -p1 -b .cve
+%patch -P 19 -p1 -b .rowhammer
 
 %build
 # Remove bundled copy of zlib
@@ -158,7 +116,10 @@ export CFLAGS="$RPM_OPT_FLAGS $F_PIE" LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
         --sbindir=%{_sbindir} \
         --libdir=%{_libdir} \
         --docdir=%{_pkgdocdir} \
+        --disable-openssl \
         --disable-root-mailer \
+        --disable-log-server \
+        --disable-log-client \
         --with-logging=syslog \
         --with-logfac=authpriv \
         --with-pam \
@@ -172,6 +133,7 @@ export CFLAGS="$RPM_OPT_FLAGS $F_PIE" LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
         --with-selinux \
         --with-passprompt="[sudo] password for %p: " \
         --with-linux-audit \
+        --disable-python \
         --with-sssd
 #       --without-kerb5 \
 #       --without-kerb4
@@ -192,8 +154,18 @@ install -p -d -m 700 $RPM_BUILD_ROOT/var/db/sudo
 install -p -d -m 700 $RPM_BUILD_ROOT/var/db/sudo/lectured
 install -p -d -m 750 $RPM_BUILD_ROOT/etc/sudoers.d
 install -p -c -m 0440 %{SOURCE1} $RPM_BUILD_ROOT/etc/sudoers
-install -p -c -m 0640 %{SOURCE3} $RPM_BUILD_ROOT/etc/sudo.conf
 install -p -c -m 0640 %{SOURCE2} $RPM_BUILD_ROOT/%{_sysconfdir}/sudo-ldap.conf
+install -p -c -m 0640 %{SOURCE3} $RPM_BUILD_ROOT/%{_sysconfdir}/sudo.conf
+
+
+# create sudo-ldap.conf man
+echo ".so man5/sudoers.ldap.5" > sudo-ldap.conf.5
+gzip sudo-ldap.conf.5
+install -p -c -m 0644 sudo-ldap.conf.5.gz $RPM_BUILD_ROOT/%{_mandir}/man5/sudo-ldap.conf.5.gz
+rm -f sudo-ldap.conf.5.gz
+
+# we are not building sendlog so we don't need this
+rm -rf $RPM_BUILD_ROOT/%{_mandir}/man8/sudo_sendlog.8
 
 # Add sudo to protected packages
 install -p -d -m 755 $RPM_BUILD_ROOT/etc/dnf/protected.d/
@@ -264,7 +236,9 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_libexecdir}/sudo
 %attr(0755,root,root) %{_libexecdir}/sudo/sesh
 %attr(0644,root,root) %{_libexecdir}/sudo/sudo_noexec.so
+%attr(0644,root,root) %{_libexecdir}/sudo/audit_json.so
 %attr(0644,root,root) %{_libexecdir}/sudo/sudoers.so
+%attr(0644,root,root) %{_libexecdir}/sudo/sample_approval.so
 %attr(0644,root,root) %{_libexecdir}/sudo/group_file.so
 %attr(0644,root,root) %{_libexecdir}/sudo/system_group.so
 %attr(0644,root,root) %{_libexecdir}/sudo/libsudo_util.so.?.?.?
@@ -298,6 +272,16 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/sudo_plugin.8*
 
 %changelog
+* Mon Jan 22 2024 Radovan Sroka <rsroka@redhat.com> - 1.9.5p2-1
+RHEL 8.9.0.Z ERRATUM
+- Rebase to 1.9.5p2
+- CVE-2023-28486 sudo: Sudo does not escape control characters in log messages
+Resolves: RHEL-21825
+- CVE-2023-28487 sudo: Sudo does not escape control characters in sudoreplay output
+Resolves: RHEL-21831
+- CVE-2023-42465 sudo: Targeted Corruption of Register and Stack Variables
+Resolves: RHEL-21820
+
 * Wed Jan 11 2023 Radovan Sroka <rsroka@redhat.com> - 1.8.29.9
 RHEL 8.8.0 ERRATUM
 - CVE-2023-22809 sudo: arbitrary file write with privileges of the RunAs user

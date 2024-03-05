@@ -1,0 +1,35 @@
+diff -up ./lib/eventlog/eventlog.c.covscan ./lib/eventlog/eventlog.c
+--- ./lib/eventlog/eventlog.c.covscan	2021-08-26 11:06:35.068915415 +0200
++++ ./lib/eventlog/eventlog.c	2021-08-26 11:13:32.432472325 +0200
+@@ -1075,10 +1075,13 @@ do_logfile_sudo(const char *logline, con
+     if (ferror(fp)) {
+ 	sudo_debug_printf(SUDO_DEBUG_ERROR|SUDO_DEBUG_LINENO|SUDO_DEBUG_ERRNO,
+ 	    "unable to write log file %s", logfile);
+-	goto done;
++	goto ddone;
+     }
+     ret = true;
+ 
++ddone:
++    (void)free(full_line);
++
+ done:
+     (void)sudo_lock_file(fileno(fp), SUDO_UNLOCK);
+     evl_conf.close_log(EVLOG_FILE, fp);
+diff -up ./logsrvd/logsrvd.c.covscan ./logsrvd/logsrvd.c
+diff -up ./plugins/audit_json/audit_json.c.covscan ./plugins/audit_json/audit_json.c
+diff -up ./plugins/sudoers/ldap.c.covscan ./plugins/sudoers/ldap.c
+--- ./plugins/sudoers/ldap.c.covscan	2021-08-26 15:46:11.614179451 +0200
++++ ./plugins/sudoers/ldap.c	2021-08-26 15:51:40.871812534 +0200
+@@ -443,6 +443,8 @@ sudo_ldap_parse_options(LDAP *ld, LDAPMe
+ 	goto done;
+     }
+ 
++    free(cp);
++
+     /* Walk through options, appending to defs. */
+     for (p = bv; *p != NULL; p++) {
+ 	char *var, *val;
+diff -up ./plugins/sudoers/logging.c.covscan ./plugins/sudoers/logging.c
+diff -up ./plugins/sudoers/rcstr.c.covscan ./plugins/sudoers/rcstr.c
+diff -up ./src/utmp.c.covscan ./src/utmp.c
