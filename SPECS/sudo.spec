@@ -1,7 +1,7 @@
 Summary: Allows restricted root access for specified users
 Name: sudo
 Version: 1.9.5p2
-Release: 10%{?dist}
+Release: 10%{?dist}.1
 License: ISC
 URL: https://www.sudo.ws
 
@@ -47,6 +47,7 @@ Patch17: sudo-1.9.13-CVE-2023-28486-7-9.patch
 Patch18: linker.patch
 
 Patch19: sudo-1.9.15-CVE-2023-42465.patch
+Patch20: sudo-1.9.17-CVE-2025-32462.patch
 
 %description
 Sudo (superuser do) allows a system administrator to give certain
@@ -100,6 +101,7 @@ BuildRequires:  python3-devel
 
 %patch -P 18 -p1 -b .linker
 %patch -P 19 -p1 -b .rowhammer
+%patch -P 20 -p1 -b .cve-host
 
 
 %build
@@ -275,6 +277,11 @@ EOF
 %attr(0644,root,root) %{_libexecdir}/sudo/python_plugin.so
 
 %changelog
+* Wed Jun 25 2025 Radovan Sroka <rsroka@redhat.com> - 1.9.5p2-10.1
+RHEL 9.6.0.Z ERRATUM
+- CVE-2025-32462 sudo: LPE via host option
+Resolves: RHEL-100016
+
 * Mon Jan 22 2024 Radovan Sroka <rsroka@redhat.com> - 1.9.5p2-10
 RHEL 9.3.0.Z ERRATUM
 - CVE-2023-28487 sudo: Sudo does not escape control characters in sudoreplay output
