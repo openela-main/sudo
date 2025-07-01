@@ -1,7 +1,7 @@
 Summary: Allows restricted root access for specified users
 Name: sudo
 Version: 1.9.5p2
-Release: 1%{?dist}
+Release: 1%{?dist}.1
 License: ISC
 Group: Applications/System
 URL: https://www.sudo.ws/
@@ -52,6 +52,7 @@ Patch17: sudo-1.9.13-CVE-2023-28486-7-9.patch
 Patch18: linker.patch
 
 Patch19: sudo-1.9.15-CVE-2023-42465.patch
+Patch20: sudo-1.9.17-CVE-2025-32462.patch
 
 %description
 Sudo (superuser do) allows a system administrator to give certain
@@ -95,8 +96,8 @@ plugins that use %{name}.
 %patch -P 17 -p1 -b .cve-escape-9
 
 %patch -P 18 -p1 -b .linker
-
 %patch -P 19 -p1 -b .rowhammer
+%patch -P 20 -p1 -b .cve-host
 
 %build
 # Remove bundled copy of zlib
@@ -272,6 +273,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/sudo_plugin.8*
 
 %changelog
+* Wed Jun 25 2025 Radovan Sroka <rsroka@redhat.com> - 1.9.5p2-10.1
+RHEL 8.10.0.Z ERRATUM
+- CVE-2025-32462 sudo: LPE via host option
+Resolves: RHEL-100014
+
 * Mon Jan 22 2024 Radovan Sroka <rsroka@redhat.com> - 1.9.5p2-1
 RHEL 8.9.0.Z ERRATUM
 - Rebase to 1.9.5p2
