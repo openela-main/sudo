@@ -1,0 +1,15 @@
+diff --git a/lib/eventlog/eventlog.c b/lib/eventlog/eventlog.c
+index 0febe66..d9f0400 100644
+--- a/lib/eventlog/eventlog.c
++++ b/lib/eventlog/eventlog.c
+@@ -176,6 +176,7 @@ new_logline(int event_type, int flags, struct eventlog_args *args,
+             sudo_lbuf_append_esc(&lbuf, LBUF_ESC_CNTRL, " %s",
+                                  evlog->env_add[i]);
+         }
++        sudo_lbuf_append(&lbuf, " ; ");
+     }
+     if (evlog->command != NULL) {
+         sudo_lbuf_append_esc(&lbuf, LBUF_ESC_CNTRL|LBUF_ESC_BLANK,
+-- 
+2.50.1
+

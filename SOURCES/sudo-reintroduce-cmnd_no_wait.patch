@@ -1,0 +1,78 @@
+From 59cd3a7330a402b289641f7d605ce3ae6671a64f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Alejandro=20L=C3=B3pez?= <allopez@redhat.com>
+Date: Wed, 16 Jul 2025 17:02:45 +0200
+Subject: [PATCH] Reintroduce cmnd_no_wait
+
+---
+ plugins/sudoers/def_data.c  |  4 ++++
+ plugins/sudoers/def_data.h  |  2 ++
+ plugins/sudoers/def_data.in |  3 +++
+ plugins/sudoers/sudoers.c   | 13 +++++++++++++
+ 4 files changed, 22 insertions(+)
+
+diff --git a/plugins/sudoers/def_data.c b/plugins/sudoers/def_data.c
+index 56cd224..19188a6 100644
+--- a/plugins/sudoers/def_data.c
++++ b/plugins/sudoers/def_data.c
+@@ -573,6 +573,10 @@ struct sudo_defs_types sudo_defs_table[] = {
+ 	"selinux", T_FLAG,
+ 	N_("Enable SELinux RBAC support"),
+ 	NULL,
++    }, {
++	"cmnd_no_wait", T_FLAG,
++	N_("Don't fork and wait for the command to finish, just exec it"),
++	NULL,
+     }, {
+ 	NULL, 0, NULL
+     }
+diff --git a/plugins/sudoers/def_data.h b/plugins/sudoers/def_data.h
+index 5c712b8..86b0886 100644
+--- a/plugins/sudoers/def_data.h
++++ b/plugins/sudoers/def_data.h
+@@ -264,6 +264,8 @@
+ #define def_log_format          (sudo_defs_table[I_LOG_FORMAT].sd_un.tuple)
+ #define I_SELINUX               131
+ #define def_selinux             (sudo_defs_table[I_SELINUX].sd_un.flag)
++#define I_CMND_NO_WAIT          132
++#define def_cmnd_no_wait        (sudo_defs_table[I_CMND_NO_WAIT].sd_un.flag)
+ 
+ enum def_tuple {
+     never,
+diff --git a/plugins/sudoers/def_data.in b/plugins/sudoers/def_data.in
+index e8162e8..b0027c4 100644
+--- a/plugins/sudoers/def_data.in
++++ b/plugins/sudoers/def_data.in
+@@ -412,3 +412,6 @@ log_format
+ selinux
+ 	T_FLAG
+ 	"Enable SELinux RBAC support"
++cmnd_no_wait
++	T_FLAG
++	"Don't fork and wait for the command to finish, just exec it"
+diff --git a/plugins/sudoers/sudoers.c b/plugins/sudoers/sudoers.c
+index 80a7089..4a972df 100644
+--- a/plugins/sudoers/sudoers.c
++++ b/plugins/sudoers/sudoers.c
+@@ -221,6 +221,19 @@ sudoers_init(void *info, char * const envp[])
+     if (set_loginclass(runas_pw ? runas_pw : sudo_user.pw))
+ 	ret = true;
+ 
++    /*
++     * Emulate cmnd_no_wait option by disabling PAM session, PTY allocation
++     * and I/O logging. This will cause sudo to execute the given command
++     * directly instead of forking a separate process for it.
++     */
++    if (def_cmnd_no_wait) {
++        def_pam_setcred = false;
++        def_pam_session = false;
++        def_use_pty = false;
++        def_log_input = false;
++        def_log_output = false;
++    }
++
+ cleanup:
+     if (!restore_perms())
+ 	ret = -1;
+-- 
+2.50.1
+
