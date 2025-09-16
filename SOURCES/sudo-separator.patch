@@ -1,0 +1,11 @@
+diff -up ./lib/eventlog/eventlog.c.separator ./lib/eventlog/eventlog.c
+--- ./lib/eventlog/eventlog.c.separator	2025-03-31 17:03:34.700244658 +0200
++++ ./lib/eventlog/eventlog.c	2025-03-31 17:04:39.943669191 +0200
+@@ -176,6 +176,7 @@ new_logline(int event_type, int flags, s
+             sudo_lbuf_append_esc(&lbuf, LBUF_ESC_CNTRL, " %s",
+                                  evlog->env_add[i]);
+         }
++        sudo_lbuf_append(&lbuf, " ; ");
+     }
+     if (evlog->command != NULL) {
+         sudo_lbuf_append_esc(&lbuf, LBUF_ESC_CNTRL|LBUF_ESC_BLANK,
