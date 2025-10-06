@@ -1,0 +1,25 @@
+diff -up ./examples/sudo.conf.in.fix ./examples/sudo.conf.in
+--- ./examples/sudo.conf.in.fix	2024-08-20 16:32:04.223791138 +0200
++++ ./examples/sudo.conf.in	2024-08-20 16:33:02.470003955 +0200
+@@ -11,9 +11,9 @@
+ # The plugin_options are optional.
+ #
+ # The sudoers plugin is used by default if no Plugin lines are present.
+-#Plugin sudoers_policy @sudoers_plugin@
+-#Plugin sudoers_io @sudoers_plugin@
+-#Plugin sudoers_audit @sudoers_plugin@
++Plugin sudoers_policy @sudoers_plugin@
++Plugin sudoers_io @sudoers_plugin@
++Plugin sudoers_audit @sudoers_plugin@
+ 
+ #
+ # Sudo askpass:
+@@ -85,7 +85,7 @@
+ # To aid in debugging sudo problems, you may wish to enable core
+ # dumps by setting "disable_coredump" to false.
+ #
+-#Set disable_coredump false
++Set disable_coredump false
+ 
+ #
+ # User groups:
