@@ -1,0 +1,14 @@
+Backported from commit 3d467a705ea6ee53081cb11cc21ecf08eb47700d
+rebuild_env: Avoid setting SHELL twice for "sudo -i"
+---
+
+--- a/plugins/sudoers/env.c	2025-11-10 16:38:59.840775518 +0100
++++ b/plugins/sudoers/env.c	2025-11-10 16:39:25.439652504 +0100
+@@ -976,6 +976,7 @@ rebuild_env(void)
+ 	if (ISSET(sudo_mode, MODE_LOGIN_SHELL)) {
+ 	    CHECK_SETENV2("SHELL", runas_pw->pw_shell,
+ 		ISSET(didvar, DID_SHELL), true);
++		SET(didvar, DID_SHELL);
+ #ifdef _AIX
+ 	    CHECK_SETENV2("LOGIN", runas_pw->pw_name,
+ 		ISSET(didvar, DID_LOGIN), true);

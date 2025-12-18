@@ -1,7 +1,7 @@
 Summary: Allows restricted root access for specified users
 Name: sudo
 Version: 1.9.5p2
-Release: 1%{?dist}.2
+Release: 1%{?dist}.3
 License: ISC
 Group: Applications/System
 URL: https://www.sudo.ws/
@@ -57,6 +57,8 @@ Patch20: sudo-1.9.17-CVE-2025-32462.patch
 Patch21: sudo-reintroduce-cmnd_no_wait.patch
 Patch22: sudo-separator.patch
 
+Patch23: rebuild_env-Avoid-setting-SHELL-twice-for-sudo-i.patch
+
 %description
 Sudo (superuser do) allows a system administrator to give certain
 users (or groups of users) the ability to run some (or all) commands
@@ -103,6 +105,7 @@ plugins that use %{name}.
 %patch -P 20 -p1 -b .cve-host
 %patch -P 21 -p1 -b .cmnd_no_wait
 %patch -P 22 -p1 -b .separator
+%patch -P 23 -p1 -b .double-shell
 
 %build
 # Remove bundled copy of zlib
@@ -278,14 +281,19 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/sudo_plugin.8*
 
 %changelog
-* Wed Jul 16 2025 Alejandro López <allopez@redhat.com> - 1.9.5p2-10.2
+* Mon Nov 17 2025 Alejandro López <allopez@redhat.com> - 1.9.5p2-1.3
+RHEL 8.10.0.Z ERRATUM
+- sudo passes SHELL environment variable twice to the shell being executed [rhel-8]
+Resolves: RHEL-127360
+
+* Wed Jul 16 2025 Alejandro López <allopez@redhat.com> - 1.9.5p2-1.2
 RHEL 8.10.0.Z ERRATUM
 - Reintroduce cmnd_no_wait
 Resolves: RHEL-51956
 - Missing separator in the log
 Resolves: RHEL-71913
 
-* Wed Jun 25 2025 Radovan Sroka <rsroka@redhat.com> - 1.9.5p2-10.1
+* Wed Jun 25 2025 Radovan Sroka <rsroka@redhat.com> - 1.9.5p2-1.1
 RHEL 8.10.0.Z ERRATUM
 - CVE-2025-32462 sudo: LPE via host option
 Resolves: RHEL-100014
