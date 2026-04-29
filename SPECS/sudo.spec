@@ -1,7 +1,7 @@
 Summary: Allows restricted root access for specified users
 Name: sudo
 Version: 1.9.5p2
-Release: 1%{?dist}.3
+Release: 1%{?dist}.5
 License: ISC
 Group: Applications/System
 URL: https://www.sudo.ws/
@@ -59,6 +59,9 @@ Patch22: sudo-separator.patch
 
 Patch23: rebuild_env-Avoid-setting-SHELL-twice-for-sudo-i.patch
 
+Patch24: sudo-1.9.17-CVE-2026-35535-1.patch
+Patch25: sudo-1.9.17-CVE-2026-35535-2.patch
+
 %description
 Sudo (superuser do) allows a system administrator to give certain
 users (or groups of users) the ability to run some (or all) commands
@@ -106,6 +109,9 @@ plugins that use %{name}.
 %patch -P 21 -p1 -b .cmnd_no_wait
 %patch -P 22 -p1 -b .separator
 %patch -P 23 -p1 -b .double-shell
+%patch -P 24 -p1 -b .cve-2026-35535-1
+%patch -P 25 -p1 -b .cve-2026-35535-2
+
 
 %build
 # Remove bundled copy of zlib
@@ -281,6 +287,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/sudo_plugin.8*
 
 %changelog
+* Thu Apr 24 2026 Alejandro López <allopez@redhat.com> - 1.9.5p2-1.5
+RHEL 8.10.0.Z ERRATUM
+- CVE-2026-35535 - Privilege escalation due to failure in privilege drop calls
+Resolves: RHEL-166060
+
 * Mon Nov 17 2025 Alejandro López <allopez@redhat.com> - 1.9.5p2-1.3
 RHEL 8.10.0.Z ERRATUM
 - sudo passes SHELL environment variable twice to the shell being executed [rhel-8]
