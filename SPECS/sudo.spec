@@ -1,7 +1,7 @@
 Summary: Allows restricted root access for specified users
 Name: sudo
 Version: 1.9.5p2
-Release: 13%{?dist}
+Release: 15%{?dist}
 License: ISC
 URL: https://www.sudo.ws
 
@@ -49,6 +49,9 @@ Patch18: linker.patch
 Patch19: sudo-1.9.15-CVE-2023-42465.patch
 Patch20: sudo-separator.patch
 Patch21: sudo-1.9.17-CVE-2025-32462.patch
+
+Patch22: sudo-1.9.17-CVE-2026-35535-1.patch
+Patch23: sudo-1.9.17-CVE-2026-35535-2.patch
 
 %description
 Sudo (superuser do) allows a system administrator to give certain
@@ -105,6 +108,8 @@ BuildRequires:  python3-devel
 %patch -P 20 -p1 -b .separator
 %patch -P 21 -p1 -b .cve-host
 
+%patch -P 22 -p1 -b .cve-2026-35535-1
+%patch -P 23 -p1 -b .cve-2026-35535-2
 
 %build
 # Remove bundled copy of zlib
@@ -279,6 +284,11 @@ EOF
 %attr(0644,root,root) %{_libexecdir}/sudo/python_plugin.so
 
 %changelog
+* Mon Apr 27 2026 Alejandro López <allopez@redhat.com> - 1.9.5p2-15
+RHEL 9.7.0 ERRATUM
+- CVE-2026-35535 - Privilege escalation due to failure in privilege drop calls
+Resolves: RHEL-166065
+
 * Fri Apr 25 2025 Radovan Sroka <rsroka@redhat.com> - 1.9.5p2-13
 RHEL: 9.7.0 ERRATUM
 - sudo missing spacing and separator in log when using "--preserve-env=list"
