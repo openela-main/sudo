@@ -1,7 +1,8 @@
-diff -up ./plugins/sudoers/auth/pam.c.fix ./plugins/sudoers/auth/pam.c
---- ./plugins/sudoers/auth/pam.c.fix	2024-08-19 06:34:03.914643249 +0200
-+++ ./plugins/sudoers/auth/pam.c	2024-08-19 06:48:46.136167294 +0200
-@@ -454,11 +454,6 @@ sudo_pam_begin_session(const struct sudo
+diff --git a/plugins/sudoers/auth/pam.c b/plugins/sudoers/auth/pam.c
+index 973d67b..88d6a52 100644
+--- a/plugins/sudoers/auth/pam.c
++++ b/plugins/sudoers/auth/pam.c
+@@ -465,11 +465,6 @@ sudo_pam_begin_session(const struct sudoers_context *ctx, struct passwd *pw,
      if (pw == NULL) {
  	if (pamh != NULL) {
  	    rc = pam_end(pamh, PAM_SUCCESS | PAM_DATA_SILENT);
@@ -13,7 +14,7 @@ diff -up ./plugins/sudoers/auth/pam.c.fix ./plugins/sudoers/auth/pam.c
  	    pamh = NULL;
  	}
  	goto done;
-@@ -517,11 +512,6 @@ sudo_pam_begin_session(const struct sudo
+@@ -528,11 +523,6 @@ sudo_pam_begin_session(const struct sudoers_context *ctx, struct passwd *pw,
  	    errstr = sudo_pam_strerror(pamh, rc);
  	    log_warningx(ctx, 0, N_("%s: %s"), "pam_open_session", errstr);
  	    rc = pam_end(pamh, *pam_status | PAM_DATA_SILENT);
@@ -25,7 +26,7 @@ diff -up ./plugins/sudoers/auth/pam.c.fix ./plugins/sudoers/auth/pam.c
  	    pamh = NULL;
  	    status = AUTH_ERROR;
  	    goto done;
-@@ -577,9 +567,6 @@ sudo_pam_end_session(sudo_auth *auth)
+@@ -588,9 +578,6 @@ sudo_pam_end_session(sudo_auth *auth)
  	}
  	rc = pam_end(pamh, PAM_SUCCESS | PAM_DATA_SILENT);
  	if (rc != PAM_SUCCESS) {
