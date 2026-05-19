@@ -1,7 +1,7 @@
 Summary: Allows restricted root access for specified users
 Name: sudo
 Version: 1.9.17p2
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: ISC
 URL: https://www.sudo.ws
 
@@ -28,6 +28,7 @@ BuildRequires: zlib-devel
 Patch1: 0001-covscan.patch
 Patch2: 0002-sudo-conf.patch
 Patch3: 0003-rebuild_env-Avoid-setting-SHELL-twice-for-sudo-i.patch
+Patch4: 0004-cve-2026-35535.patch
 
 %description
 Sudo (superuser do) allows a system administrator to give certain
@@ -63,6 +64,7 @@ BuildRequires:  python3-devel
 %patch -P 1 -p1 -b .covscan
 %patch -P 2 -p1 -b .sudo-conf
 %patch -P 3 -p1 -b .double-shell
+%patch -P 4 -p1 -b .cve-2026-35535
 
 
 %build
@@ -239,6 +241,10 @@ EOF
 %attr(0644,root,root) %{_libexecdir}/sudo/python_plugin.so
 
 %changelog
+* Thu Apr 09 2026 Alejandro López <allopez@redhat.com> - 1.9.17p2-3
+- CVE-2026-35535 sudo: Privilege escalation due to failure in privilege drop calls
+Resolves: RHEL-166069
+
 * Mon Nov 17 2025 Alejandro López <allopez@redhat.com> - 1.9.17p2-2
 - Request to backport support for regex in sudo [rhel-9]
 Resolves: RHEL-1376
