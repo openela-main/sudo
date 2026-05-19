@@ -1,7 +1,7 @@
 Summary: Allows restricted root access for specified users
 Name: sudo
-Version: 1.9.5p2
-Release: 15%{?dist}
+Version: 1.9.17p2
+Release: 2%{?dist}
 License: ISC
 URL: https://www.sudo.ws
 
@@ -25,33 +25,9 @@ BuildRequires: sendmail
 BuildRequires: gettext
 BuildRequires: zlib-devel
 
-Patch1: sudo-conf.patch
-Patch2: sudo-1.9.5-undefined-symbol.patch
-Patch3: sudo-1.9.5-selinux-t.patch
-Patch4: sudo-1.9.5-sesh-bad-condition.patch
-Patch5: sudo-1.9.5-utmp-leak.patch
-Patch6: covscan.patch
-Patch7: sha-digest-calc.patch
-Patch8: sudo-1.9.12-CVE-2023-22809.patch
-
-Patch9: sudo-1.9.13-CVE-2023-28486-7-1.patch
-Patch10: sudo-1.9.13-CVE-2023-28486-7-2.patch
-Patch11: sudo-1.9.13-CVE-2023-28486-7-3.patch
-Patch12: sudo-1.9.13-CVE-2023-28486-7-4.patch
-Patch13: sudo-1.9.13-CVE-2023-28486-7-5.patch
-Patch14: sudo-1.9.13-CVE-2023-28486-7-6.patch
-Patch15: sudo-1.9.13-CVE-2023-28486-7-7.patch
-Patch16: sudo-1.9.13-CVE-2023-28486-7-8.patch
-Patch17: sudo-1.9.13-CVE-2023-28486-7-9.patch
-
-Patch18: linker.patch
-
-Patch19: sudo-1.9.15-CVE-2023-42465.patch
-Patch20: sudo-separator.patch
-Patch21: sudo-1.9.17-CVE-2025-32462.patch
-
-Patch22: sudo-1.9.17-CVE-2026-35535-1.patch
-Patch23: sudo-1.9.17-CVE-2026-35535-2.patch
+Patch1: 0001-covscan.patch
+Patch2: 0002-sudo-conf.patch
+Patch3: 0003-rebuild_env-Avoid-setting-SHELL-twice-for-sudo-i.patch
 
 %description
 Sudo (superuser do) allows a system administrator to give certain
@@ -84,32 +60,10 @@ BuildRequires:  python3-devel
 %prep
 %setup -q
 
-%patch -P 1 -p1 -b .sudo-conf
-%patch -P 2 -p1 -b .undefined
-%patch -P 3 -p1 -b .selinux-t
-%patch -P 4 -p1 -b .bad-cond
-%patch -P 5 -p1 -b .utmp-leak
-%patch -P 6 -p1 -b .covscan
-%patch -P 7 -p1 -b .sha-digest
-%patch -P 8 -p1 -b .cve-fix
+%patch -P 1 -p1 -b .covscan
+%patch -P 2 -p1 -b .sudo-conf
+%patch -P 3 -p1 -b .double-shell
 
-%patch -P 9 -p1 -b .cve-escape-1
-%patch -P 10 -p1 -b .cve-escape-2
-%patch -P 11 -p1 -b .cve-escape-3
-%patch -P 12 -p1 -b .cve-escape-4
-%patch -P 13 -p1 -b .cve-escape-5
-%patch -P 14 -p1 -b .cve-escape-6
-%patch -P 15 -p1 -b .cve-escape-7
-%patch -P 16 -p1 -b .cve-escape-8
-%patch -P 17 -p1 -b .cve-escape-9
-
-%patch -P 18 -p1 -b .linker
-%patch -P 19 -p1 -b .rowhammer
-%patch -P 20 -p1 -b .separator
-%patch -P 21 -p1 -b .cve-host
-
-%patch -P 22 -p1 -b .cve-2026-35535-1
-%patch -P 23 -p1 -b .cve-2026-35535-2
 
 %build
 # Remove bundled copy of zlib
@@ -133,6 +87,7 @@ export CFLAGS="$RPM_OPT_FLAGS $F_PIE" LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
         --disable-root-mailer \
         --disable-log-server \
         --disable-log-client \
+        --enable-intercept \
         --with-logging=syslog \
         --with-logfac=authpriv \
         --with-pam \
@@ -159,7 +114,7 @@ make check
 rm -rf $RPM_BUILD_ROOT
 
 # Update README.LDAP (#736653)
-sed -i 's|/etc/ldap\.conf|%{_sysconfdir}/sudo-ldap.conf|g' README.LDAP
+sed -i 's|/etc/ldap\.conf|%{_sysconfdir}/sudo-ldap.conf|g' README.LDAP.md
 
 make install DESTDIR="$RPM_BUILD_ROOT" install_uid=`id -u` install_gid=`id -g` sudoers_uid=`id -u` sudoers_gid=`id -g`
 
@@ -189,7 +144,7 @@ rm -f sudo.conf
 chmod +x $RPM_BUILD_ROOT%{_libexecdir}/sudo/*.so # for stripping, reset in %%files
 
 # Don't package LICENSE as a doc
-rm -rf $RPM_BUILD_ROOT%{_pkgdocdir}/LICENSE
+rm -rf $RPM_BUILD_ROOT%{_pkgdocdir}/LICENSE.md
 
 # Remove examples; Examples can be found in man pages too.
 rm -rf $RPM_BUILD_ROOT%{_datadir}/examples/sudo
@@ -247,9 +202,9 @@ EOF
 %attr(0644,root,root) %{_libexecdir}/sudo/sudo_noexec.so
 %attr(0644,root,root) %{_libexecdir}/sudo/audit_json.so
 %attr(0644,root,root) %{_libexecdir}/sudo/sudoers.so
-%attr(0644,root,root) %{_libexecdir}/sudo/sample_approval.so
 %attr(0644,root,root) %{_libexecdir}/sudo/group_file.so
 %attr(0644,root,root) %{_libexecdir}/sudo/system_group.so
+%attr(0644,root,root) %{_libexecdir}/sudo/sudo_intercept.so
 %attr(0644,root,root) %{_libexecdir}/sudo/libsudo_util.so.?.?.?
 %{_libexecdir}/sudo/libsudo_util.so.?
 %{_libexecdir}/sudo/libsudo_util.so
@@ -266,7 +221,7 @@ EOF
 %dir %{_pkgdocdir}/
 %{_pkgdocdir}/*
 %{!?_licensedir:%global license %%doc}
-%license doc/LICENSE
+%license LICENSE.md
 %exclude %{_pkgdocdir}/ChangeLog
 
 # Make sure permissions are ok even if we're updating
@@ -277,17 +232,20 @@ EOF
 %files devel
 %doc plugins/sample/sample_plugin.c
 %{_includedir}/sudo_plugin.h
-%{_mandir}/man8/sudo_plugin.8*
+%{_mandir}/man5/sudo_plugin.5*
 
 %files python-plugin
-%{_mandir}/man8/sudo_plugin_python.8.gz
+%{_mandir}/man5/sudo_plugin_python.5.gz
 %attr(0644,root,root) %{_libexecdir}/sudo/python_plugin.so
 
 %changelog
-* Mon Apr 27 2026 Alejandro López <allopez@redhat.com> - 1.9.5p2-15
-RHEL 9.7.0 ERRATUM
-- CVE-2026-35535 - Privilege escalation due to failure in privilege drop calls
-Resolves: RHEL-166065
+* Mon Nov 17 2025 Alejandro López <allopez@redhat.com> - 1.9.17p2-2
+- Request to backport support for regex in sudo [rhel-9]
+Resolves: RHEL-1376
+- Rebase of sudo to 1.9.17p2 [rhel-9]
+Resolves: RHEL-128623
+- sudo passes SHELL environment variable twice to the shell being executed [rhel-9]
+Resolves: RHEL-127359
 
 * Fri Apr 25 2025 Radovan Sroka <rsroka@redhat.com> - 1.9.5p2-13
 RHEL: 9.7.0 ERRATUM
