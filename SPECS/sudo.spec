@@ -1,7 +1,7 @@
 Summary: Allows restricted root access for specified users
 Name: sudo
 Version: 1.9.17p2
-Release: 3%{?dist}
+Release: 3%{?dist}.1
 License: ISC
 URL: https://www.sudo.ws
 
@@ -29,6 +29,10 @@ Patch1: 0001-covscan.patch
 Patch2: 0002-sudo-conf.patch
 Patch3: 0003-rebuild_env-Avoid-setting-SHELL-twice-for-sudo-i.patch
 Patch4: 0004-cve-2026-35535.patch
+# https://github.com/sudo-project/sudo/commit/71fbe42dcd5a1c8f799540583a2dfb2ae6221edf
+# https://github.com/sudo-project/sudo/commit/02b14c043825b52be6cd537b7f11bd5e7e10512e
+# https://github.com/sudo-project/sudo/commit/f95ace6a945a82a3f49d5693a490b4f903f6edb0
+Patch5: 0005-cve-2026-82474.patch
 
 %description
 Sudo (superuser do) allows a system administrator to give certain
@@ -65,6 +69,7 @@ BuildRequires:  python3-devel
 %patch -P 2 -p1 -b .sudo-conf
 %patch -P 3 -p1 -b .double-shell
 %patch -P 4 -p1 -b .cve-2026-35535
+%patch -P 5 -p1 -b .cve-2026-82474
 
 
 %build
@@ -241,6 +246,10 @@ EOF
 %attr(0644,root,root) %{_libexecdir}/sudo/python_plugin.so
 
 %changelog
+* Mon Sep 07 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.9.17p2-3.1
+- CVE-2026-82474 sudo: execveat(2) intercept/log_subcmds bypass
+Resolves: RHEL-255647
+
 * Thu Apr 09 2026 Alejandro López <allopez@redhat.com> - 1.9.17p2-3
 - CVE-2026-35535 sudo: Privilege escalation due to failure in privilege drop calls
 Resolves: RHEL-166069
