@@ -1,7 +1,7 @@
 Summary: Allows restricted root access for specified users
 Name: sudo
 Version: 1.9.17p2
-Release: 3%{?dist}.1
+Release: 3%{?dist}.3
 License: ISC
 URL: https://www.sudo.ws
 
@@ -33,6 +33,8 @@ Patch4: 0004-cve-2026-35535.patch
 # https://github.com/sudo-project/sudo/commit/02b14c043825b52be6cd537b7f11bd5e7e10512e
 # https://github.com/sudo-project/sudo/commit/f95ace6a945a82a3f49d5693a490b4f903f6edb0
 Patch5: 0005-cve-2026-82474.patch
+# https://github.com/sudo-project/sudo/commit/1820a349687522f51023d1ae5925125f59679a8c
+Patch6: 0006-cve-2026-96512.patch
 
 %description
 Sudo (superuser do) allows a system administrator to give certain
@@ -70,6 +72,7 @@ BuildRequires:  python3-devel
 %patch -P 3 -p1 -b .double-shell
 %patch -P 4 -p1 -b .cve-2026-35535
 %patch -P 5 -p1 -b .cve-2026-82474
+%patch -P 6 -p1 -b .cve-2026-96512
 
 
 %build
@@ -246,6 +249,10 @@ EOF
 %attr(0644,root,root) %{_libexecdir}/sudo/python_plugin.so
 
 %changelog
+* Tue Sep 29 2026 Alejandro López <allopez@redhat.com> - 1.9.17p2-3.3
+- CVE-2026-96512 sudo: TZ environment variable allows bypass of NOTBEFORE/NOTAFTER time-based authorization [rhel-9.8.z]
+Resolves: RHEL-267328
+
 * Mon Sep 07 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.9.17p2-3.1
 - CVE-2026-82474 sudo: execveat(2) intercept/log_subcmds bypass
 Resolves: RHEL-255647
