@@ -1,7 +1,7 @@
 Summary: Allows restricted root access for specified users
 Name: sudo
 Version: 1.9.5p2
-Release: 1%{?dist}.5
+Release: 2%{?dist}
 License: ISC
 Group: Applications/System
 URL: https://www.sudo.ws/
@@ -62,6 +62,8 @@ Patch23: rebuild_env-Avoid-setting-SHELL-twice-for-sudo-i.patch
 Patch24: sudo-1.9.17-CVE-2026-35535-1.patch
 Patch25: sudo-1.9.17-CVE-2026-35535-2.patch
 
+Patch26: sudo-1.9.17-CVE-2026-96512.patch
+
 %description
 Sudo (superuser do) allows a system administrator to give certain
 users (or groups of users) the ability to run some (or all) commands
@@ -111,6 +113,7 @@ plugins that use %{name}.
 %patch -P 23 -p1 -b .double-shell
 %patch -P 24 -p1 -b .cve-2026-35535-1
 %patch -P 25 -p1 -b .cve-2026-35535-2
+%patch -P 26 -p1 -b .cve-2026-96512
 
 
 %build
@@ -287,6 +290,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man8/sudo_plugin.8*
 
 %changelog
+* Wed Sep 23 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 1.9.5p2-2
+RHEL 8.10.0.Z ERRATUM
+- CVE-2026-96512 - TZ environment variable allows bypass of NOTBEFORE/NOTAFTER time-based authorization [rhel-8.10.z]
+Resolves: RHEL-267341
+
 * Thu Apr 24 2026 Alejandro López <allopez@redhat.com> - 1.9.5p2-1.5
 RHEL 8.10.0.Z ERRATUM
 - CVE-2026-35535 - Privilege escalation due to failure in privilege drop calls
